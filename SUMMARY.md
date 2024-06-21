@@ -18,14 +18,20 @@
 
 * [dApps](dapps/README.md)
   * [Templates](dapps/templates.md)
-* [Bots](bots/README.md)
+* [Bots](bots.md)
   * [DEX Trading](bots/dex-trading.md)
   * [Perps DEX Trading](bots/perps-dex-trading.md)
   * [CEX Trading](bots/cex-trading.md)
   * [Sweeper](bots/sweeper.md)
+  * [Hummingbot](bots/hummingbot.md)
 
 ## Reference
 
-* [API Reference](reference/api-reference/README.md)
-  * [Pets](reference/api-reference/pets.md)
-  * [Users](reference/api-reference/users.md)
+* [Moralis API](reference/moralis-api/README.md)
+  * [Data](reference/moralis-api/data/README.md)
+    * [Ethereum](reference/moralis-api/data/ethereum.md)
+    * [Solana](reference/moralis-api/data/solana.md)
+  * [Streams](reference/moralis-api/streams.md)
+* [Alchemy API](reference/alchemy-api.md)
+* [QuickNode API](reference/quicknode-api.md)
+* [NodeReal API](reference/nodereal-api.md)
