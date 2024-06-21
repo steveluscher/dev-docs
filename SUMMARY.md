@@ -16,7 +16,13 @@
 
 ***
 
-* [Bots](bots.md)
+* [dApps](dapps/README.md)
+  * [Templates](dapps/templates.md)
+* [Bots](bots/README.md)
+  * [DEX Trading](bots/dex-trading.md)
+  * [Perps DEX Trading](bots/perps-dex-trading.md)
+  * [CEX Trading](bots/cex-trading.md)
+  * [Sweeper](bots/sweeper.md)
 
 ## Reference
 
