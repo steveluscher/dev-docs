@@ -8,11 +8,11 @@
   * [Libraries](development-stack/libraries.md)
   * [Middleware](development-stack/middleware.md)
 
-## Chains
+## Layer1 Chains
 
-* [Ethereum](chains/ethereum.md)
-* [Solana](chains/solana.md)
-* [Cosmos](chains/cosmos.md)
+* [Ethereum](layer1-chains/ethereum.md)
+* [Solana](layer1-chains/solana.md)
+* [Cosmos](layer1-chains/cosmos.md)
 
 ***
 
@@ -23,7 +23,10 @@
   * [Perps DEX Trading](bots/perps-dex-trading.md)
   * [CEX Trading](bots/cex-trading.md)
   * [Sweeper](bots/sweeper.md)
-  * [Hummingbot](bots/hummingbot.md)
+  * [Hummingbot](bots/hummingbot/README.md)
+    * [Installation](bots/hummingbot/installation.md)
+    * [Launching](bots/hummingbot/launching.md)
+  * [Sniper](bots/sniper.md)
 
 ## Reference
 
