@@ -38,3 +38,8 @@
 * [Alchemy API](reference/alchemy-api.md)
 * [QuickNode API](reference/quicknode-api.md)
 * [NodeReal API](reference/nodereal-api.md)
+
+## Layer2 Chains
+
+* [Optimism](layer2-chains/optimism.md)
+* [Arbitrum](layer2-chains/arbitrum.md)
