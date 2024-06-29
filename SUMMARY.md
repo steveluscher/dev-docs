@@ -13,6 +13,7 @@
 * [Ethereum](layer1-chains/ethereum.md)
 * [Solana](layer1-chains/solana/README.md)
   * [Jupiter](layer1-chains/solana/jupiter.md)
+  * [Helius](layer1-chains/solana/helius.md)
 * [Cosmos](layer1-chains/cosmos.md)
 
 ***
