@@ -10,14 +10,6 @@ Jupiter API is the easiest way for developers to access liquidity on Solana. Sim
 
 <details>
 
-<summary>Click to play video</summary>
-
-
-
-</details>
-
-<details>
-
 <summary>POSThttps://quote-api.jup.ag/v6/swap</summary>
 
 #### Request Parameters[​](https://station.jup.ag/docs/apis/swap-api#request-parameters) <a href="#request-parameters" id="request-parameters"></a>
