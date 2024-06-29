@@ -11,7 +11,8 @@
 ## Layer1 Chains
 
 * [Ethereum](layer1-chains/ethereum.md)
-* [Solana](layer1-chains/solana.md)
+* [Solana](layer1-chains/solana/README.md)
+  * [Jupiter](layer1-chains/solana/jupiter.md)
 * [Cosmos](layer1-chains/cosmos.md)
 
 ***
