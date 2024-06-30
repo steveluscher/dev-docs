@@ -687,6 +687,335 @@ makeRequest(); // call the makeRequest function to start the retry loop
 
 By implementing retries in your Alchemy application, you can help ensure that your application can handle errors and continue to function reliably even in the face of unexpected errors and network disruptions.
 
+## getLargestAccounts
+
+POST https://{solana-mainnet}.g.alchemy.com/v2/{apiKey}
+
+Returns the 20 largest accounts, by lamport balance (results may be cached up to two hours).
+
+import sdk from '@api/alchemy-docs';
+
+sdk.getLargestAccounts({ id: 1, jsonrpc: '2.0', method: 'getLargestAccounts' }, {apiKey: 'docs-demo'}) .then(({ data }) => console.log(data)) .catch(err => console.error(err));
+
+```
+import sdk from '@api/alchemy-docs';
+
+sdk.getLargestAccounts({
+  id: 1,
+  jsonrpc: '2.0',
+  method: 'getLargestAccounts'
+}, {apiKey: 'docs-demo'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+```
+
+## getTokenAccountBalance
+
+POST https://{network}.g.alchemy.com/v2/{apiKey}
+
+Returns the token balance of an SPL Token account..
+
+#### Parameters
+
+***
+
+* `<base-58 encoded string>` - Pubkey of queried token account
+* `<object>` - (optional) Config object:
+  * `commitment:` \<object> - (optional) Configures the commitment level of the blocks queried\
+    Accepts one of the following strings: \[`"finalized"`, `"confirmed"`, `"processed"]`\
+    For more info, refer to this [doc](https://docs.solana.com/developing/clients/jsonrpc-api#configuring-state-commitment).
+
+***
+
+#### Results
+
+***
+
+* `amount:` \<u64 string> - the raw balance without decimals
+* `decimals:` \<u8> - number of base 10 digits to the right of the decimal place
+* `uiAmountString: <string>` - the balance as a string, using mint-prescribed decimals
+
+***
+
+#### Example
+
+***
+
+**Request**
+
+***
+
+cURL
+
+```curl
+curl --location --request POST 'https://solana-mainnet.g.alchemy.com/v2/alch-demo/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "method": "getTokenAccountBalance",
+    "jsonrpc": "2.0",
+    "params": [
+        "3Lz6rCrXdLybFiuJGJnEjv6Z2XtCh5n4proPGP2aBkA1"
+    ],
+    "id": "017a141e-9a15-4ce3-b039-865e7dc7da00"
+}'
+```
+
+***
+
+**Response**
+
+***
+
+JavaScript
+
+```javascript
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "context": {
+            "slot": 137567036
+        },
+        "value": {
+            "amount": "301922375078",
+            "decimals": 6,
+            "uiAmount": 301922.375078,
+            "uiAmountString": "301922.375078"
+        }
+    },
+    "id": "017a141e-9a15-4ce3-b039-865e7dc7da00"
+}
+```
+
+```
+// project example
+
+import sdk from '@api/alchemy-docs';
+
+sdk.getTokenAccountBalance({
+  id: 1,
+  jsonrpc: '2.0',
+  method: 'getTokenAccountBalance'
+}, {apiKey: 'docs-demo'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+```
+
+## getBalance
+
+POST https://{network}.g.alchemy.com/v2/{apiKey}
+
+Returns the balance of the account of provided Pubkey.
+
+#### Parameters
+
+* `<base-58 encoded string>` - Pubkey of account to query
+* `<object>` - (optional) Config object:
+  * `commitment:` (optional) \<string> - Configures the commitment level of the blocks queried\
+    Accepts one of the following strings: \[`"finalized"`, `"confirmed"`, `"processed"]`\
+    For more info, refer to this [doc](https://docs.solana.com/developing/clients/jsonrpc-api#configuring-state-commitment).
+  * `minContextSlot:` (optional) \<number> - set the minimum slot that the request can be evaluated at.
+
+#### Result
+
+* `RpcResponse:`\<u64> - RpcResponse JSON object with `value` field set to the balance
+
+#### Example
+
+**Request**
+
+cURL
+
+```curl
+curl --location --request POST 'https://solana-mainnet.g.alchemy.com/v2/demo' \
+--header 'Content-Type: application/json' \
+--data-raw '  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method":"getBalance", 
+    "params":
+    [
+    "83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri"
+    ]
+  }'
+```
+
+**Response**
+
+JavaScript
+
+```javascript
+{
+  "jsonrpc": "2.0",
+  "result": { "context": { "slot": 1 }, "value": 0 },
+  "id": 1
+}
+```
+
+```
+// project example
+
+import sdk from '@api/alchemy-docs';
+
+sdk.getBalance({
+  id: 1,
+  jsonrpc: '2.0',
+  method: 'getBalance'
+}, {apiKey: 'docs-demo'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+```
+
+## getRecentPrioritizationFees
+
+POST https://{network}.g.alchemy.com/v2/{apiKey}
+
+Returns a list of prioritization fees from recent blocks. Currently, a node's prioritization-fee cache stores data from up to 150 blocks.
+
+```
+// project example
+
+import sdk from '@api/alchemy-docs';
+
+sdk.getRecentPrioritizationFees({
+  id: 1,
+  jsonrpc: '2.0',
+  method: 'getRecentPrioritizationFees'
+}, {apiKey: 'docs-demo'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+```
+
+## getBlockHeight
+
+POST https://{network}.g.alchemy.com/v2/{apiKey}
+
+Returns the current block height of the node.
+
+```
+// project example
+
+import sdk from '@api/alchemy-docs';
+
+sdk.getBlockHeight({
+  id: 1,
+  jsonrpc: '2.0',
+  method: 'getBlockHeight'
+}, {apiKey: 'docs-demo'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+```
+
+## getSignatureStatuses
+
+POSThttps://{network}.g.alchemy.com/v2/{apiKey}
+
+Returns the statuses of a list of signatures.
+
+#### Parameters
+
+***
+
+* \<array of base-58 encoded string> - An array of transaction signatures to confirm
+* `<object>` - (optional) Configuration object containing the following field:
+  * `searchTransactionHistory:` \<bool> - if true, a Solana node will search its ledger cache for any signatures not found in the recent status cache
+
+***
+
+#### Results
+
+***
+
+**Known Tx**
+
+***
+
+* `<object>`
+  * `slot:` \<u64> - The slot the transaction was processed
+  * `confirmations:` \<usize | null> - Number of blocks since signature confirmation, null if rooted, as well as finalized by a supermajority of the cluster
+  * `err:` \<object | null> - Error if transaction failed, null if transaction succeeded.
+  * `confirmationStatus:` \<string | null> - The transaction's cluster confirmation status; either `processed`, `confirmed`, or `finalized`. See [Commitment](https://docs.solana.com/developing/clients/jsonrpc-api#configuring-state-commitment) for more on optimistic confirmation.
+
+***
+
+**Unknown Tx**
+
+***
+
+* `<null>` - Unknown transaction
+
+***
+
+#### Example
+
+***
+
+**Request**
+
+***
+
+cURL
+
+```curl
+curl --location --request POST 'https://solana-mainnet.g.alchemy.com/v2/alch-demo/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "method": "getSignatureStatuses",
+    "jsonrpc": "2.0",
+    "params": [
+        [
+            "28P1gdVq52uEbCHns4EL5DCMjU5PtcBo5M3Gju4FX8DLwjLPDchudttnQapAxYy5dkdVZ6sqa6pvtgC5mbKLqfQA"
+        ],
+        {
+            "searchTransactionHistory": true
+        }
+    ]
+}'
+```
+
+***
+
+#### Response
+
+***
+
+JavaScript
+
+```javascript
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "context": {
+            "slot": 137569378
+        },
+        "value": [
+            {
+                "confirmationStatus": "finalized",
+                "confirmations": null,
+                "err": null,
+                "slot": 137529522,
+                "status": {
+                    "Ok": null
+                }
+            }
+        ]
+    }
+}
+```
+
+```
+// project example
+
+import sdk from '@api/alchemy-docs';
+
+sdk.getSignatureStatuses({
+  id: 1,
+  jsonrpc: '2.0',
+  method: 'getSignatureStatuses'
+}, {apiKey: 'docs-demo'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+```
+
 ## How to Subscribe to Pending Transactions via WebSocket Endpoints
 
 Learn how to subscribe to pending transactions via WebSockets, and filters the transactions based on specified from and/or to addresses.
@@ -2164,3 +2493,216 @@ Then, definitely try to build a dashboard to keep track of a wallet movement, or
 
 Or why not, a platform that keeps track of crypto prices across multiple pools?
 
+## Alchemy Subgraphs Overview
+
+Learn about subgraphs, their uses cases and the Alchemy Subgraphs platform.
+
+[Suggest Edits](https://docs.alchemy.com/edit/alchemy-subgraphs-overview)
+
+Alchemy Subgraphs (formerly Satsuma) is a blockchain indexing platform with drop-in support for hosted subgraphs.
+
+### Understanding Subgraphs
+
+Alchemy Subgraphs allow developers to create specialized APIs, aka **subgraphs**, that define how to ingest, process, and store information from the blockchain, making it easier for apps to query blockchain data
+
+### Pain Points Addressed by Alchemy Subgraphs
+
+Alchemy Subgraphs offer a solution designed to mitigate the following pain points and streamline the process for developers:
+
+#### **1. In-House Indexing System Limitations**
+
+The main alternative to subgraphs is developing an in-house indexing system, which is resource-intensive, and has considerable drawbacks:
+
+* **Engineering Time & Cost**: Engineering resources from product development are diverted in order to construct and maintain a custom indexing system.
+* **Complexity & Expertise**: Building an indexing system requires specialized knowledge about blockchain intricacies, such as reorgs and data decoding. Companies often face a steep learning curve or need to hire additional, specialized staff.
+
+#### **2. Limitations with **_**Existing**_** Subgraph Services**
+
+Using subgraphs with other current hosted services, also comes with its challenges:
+
+* **Performance Issues**: Slow initial sync times, reindexes, and query response can bottleneck development.
+* **Reliability Concerns**: Downtime and inconsistent API performance, often due to operational inefficiencies, user abuse, or maintenance, can disrupt services.
+* **Lack of Visibility**: Insufficient insights into indexing and query metrics lead to a lack of trust and additional time spent debugging.
+* **Data Lag**: Delays in data updates can impede real-time functionality.
+* **Customer Support**: Limited or no direct support hampers problem resolution.
+
+Current decentralized services introduce further complications:
+
+* **Operational Overhead**: Using this service entails complex processes such as acquiring and staking tokens, and signaling your subgraph to indexers.
+* **Exposure and Privacy**: The necessity to make your subgraph publicly accessible.
+* **Indexer Reliance**: No guarantee that indexers will prioritize or even process your subgraph.
+* **Technical Support**: Lack of a direct line for technical support to indexers can prolong issue resolution.
+
+#### **3. Self-Hosting Difficulties**
+
+Self-hosting subgraphs brings its own set of issues:
+
+* **Maintenance Burden**: Operators need to invest significant time and effort into system upkeep.
+* **Performance Dependency**: Indexing speed is contingent on running personal RPC nodes.
+* **Infrastructure Costs**: There are high costs associated with running the necessary graph node, database, and RPC nodes.
+
+### Alchemy Subgraphs APIs
+
+* [Subgraphs Quickstart](https://docs.alchemy.com/reference/subgraphs-quickstart)
+* [Developing a Subgraph](https://docs.alchemy.com/reference/developing-a-subgraph)
+  * [Graph CLI](https://docs.alchemy.com/reference/graph-cli)
+  * [Creating a Subgraph](https://docs.alchemy.com/reference/creating-a-subgraph)
+  * [Project Structure](https://docs.alchemy.com/reference/project-structure)
+  * [Data Sources](https://docs.alchemy.com/reference/data-sources)
+  * [Writing Mappings](https://thegraph.com/docs/en/developing/creating-a-subgraph/#writing-mappings)
+* [Moving Your Subgraph to Production](https://docs.alchemy.com/reference/moving-to-production)
+  * [Deploying a Subgraph](https://docs.alchemy.com/reference/deploying-a-subgraph)
+  * [Subgraph Versioning](https://docs.alchemy.com/reference/subgraph-versioning)
+  * [Querying a Subgraph](https://docs.alchemy.com/reference/querying-a-subgraph)
+  * [Deleting a Subgraph](https://docs.alchemy.com/reference/deleting-a-subgraph)
+  * [Supported Subgraph Chains](https://docs.alchemy.com/reference/supported-subgraph-chains)
+  * [Direct Database Access](https://docs.alchemy.com/reference/direct-database-access)
+
+## Introduction to Subgraphs
+
+[Suggest Edits](https://docs.alchemy.com/edit/introduction-to-subgraphs)
+
+Alchemy Subgraphs allow developers to create specialized APIs, aka **subgraphs**, that define how to ingest, process, and store information from the blockchain, making it easier for apps to query blockchain data.
+
+### What is a subgraph?
+
+**Subgraphs aggregate application-specific blockchain data for quick access to frontend developers.**
+
+Subgraph are exposed to developers via GraphQL APIs, allowing users to query the transaction data happening on their contract in real time. Subgraphs are especially beneficial for developers of complex, custom smart contracts that need to have robust frontend interfaces.
+
+For example, to query all transactions within a single Uniswap v3 liquidity pool over the last 24 hours, Uniswap simply needs to define their schema, index the event data to create the subgraph, and then use the generated GraphQL API to query their subgraph for flexible and efficient blockchain data.
+
+Subgraphs allow developers to filter and sort data based on their needs, letting them extract only the information important to their dapp. Subgraphs also enable more efficient data querying by precompiling and indexing data to speed up the querying process instead of requesting data directly from full nodes or archive nodes. Let's dive in further... 🤿
+
+### Why Do We Need Subgraphs & What Problem Do They Solve?
+
+Before we dive deeper into subgraphs, let's first quickly analyze blockchains as data structures. It's helpful to view blockchains simply as databases that are distributed and decentralized. Blockchain databases grow by perpetually adding new blocks, each full of data.
+
+The thing about blockchains is, if viewed as databases, they mainly optimize for:
+
+* **Immutability**: once data is added, it is really difficult to change that data, so data integrity and historical accuracy is excellent.
+* **Transparency**: all data is public, verifiable and accessible by all.
+* **Decentralization**: blockchains deliver trustless and censorship-resistant server environments for all to use, given there is no central operator.
+* **Security**: all transactions must be independently verified by all network participants, which makes fraudulent transactions virtually impossible.
+
+All of the above properties are **awesome** for a database to have! They enable applications built on blockchain databases to be really powerful, as developers can lace these properties into the user experience.
+
+_However_, while blockchains optimize for all of the above properties in great ways, they are not so great for complex data querying. When you need to find a specific piece of data in the blockchain, you need to read through _every single block ever_ and attempt to find your specific piece of data - this is obviously not very efficient! Modern databases (ie, SQL, MongoDB, Postgres DB) are a great solution for complex data querying; **subgraphs** will help us set up and maintain one such database to help us perform quick and efficient complex data queries to the blockchain.
+
+Say, for example, you are writing a blockchain analytics app and you want to get all of the latest transfers on the [$USDC smart contract](https://docs.alchemy.com/docs/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48). Without a subgraph, you'd need to brute force the last 10 or so blocks on the chain, each containing \~150 transactions. In each block, you'd have to check each transaction to see if there was any interaction with the relevant contract address. That's a lot of brute-force searching and that's just for 10 blocks! Here's how a subgraph can help make this query more efficient:
+
+![](https://files.readme.io/becfea4-image\_10.png)
+
+As seen in the diagram above, subgraphs are helpful for indexing complex blockchain data into easily queryable formats, unlocking faster speed and data reliability for end-user and developers alike. The subgraph will consume all of our wanted data for us and set it up in easy-to-query format for us to enjoy as application developers. This subgraph solution becomes even more needed when you need to calculate some aggregate data across all historical blocks, like total inflows ever for a pool.
+
+Want to dive deeper? Check out [this comprehensive Alchemy blog post on subgraphs](https://www.alchemy.com/overviews/what-is-a-subgraph#what-is-a-subgraph)!
+
+## How To Query a Subgraph
+
+See examples on how to query subgraphs deployed on Alchemy Subgraphs.
+
+[Suggest Edits](https://docs.alchemy.com/edit/how-to-query-a-subgraph)
+
+### Introduction
+
+In this guide, we will walk you through the process of querying an already-deployed subgraph on the Alchemy Subgraphs platform. We will include a couple of simple queries to help you get an idea on the type of data you can get using subgraphs.
+
+There are a couple of ways you can query a subgraph, we will cover using:
+
+1. [Alchemy Subgraphs](https://subgraphs.alchemy.com/dashboard) GraphQL Playground
+2. [Postman](https://www.postman.com/)
+
+### 1. Using the Alchemy Subgraphs GraphQL Playground
+
+1. Go to one of your deployed subgraphs in the [Alchemy Subgraphs Dashboard](https://subgraphs.alchemy.com/dashboard) and go to the `Playground` URL at the center-top of the page
+2. Check out the GraphiQL interface. This playground let's you type in GraphQL-formatted queries and send them as a data request to the loaded subgraph.
+
+![](https://files.readme.io/a02e8b8-Screenshot\_2023-10-30\_at\_1.11.14\_PM.png)
+
+3. Delete all of the comments so you have a clean input space to play with.
+4. Copy-paste one of the following queries into the playground, then hit the Play button or press Ctrl + Enter (or Cmd + Enter on Mac) to execute the query:
+
+### Sample Queries
+
+If you are using the Pudgy Penguins Transfers subgraph you built in the previous guides, here are some queries you can make:
+
+### Query to get the first 100 Pudgy Penguin transfers:
+
+GraphQL
+
+```Text
+{
+  transfers(first: 100) {
+    id
+    from
+    to
+    tokenId
+    blockNumber
+    blockTimestamp
+    transactionHash
+  }
+}
+```
+
+### Query to get all transfers from a specific address
+
+GraphQL
+
+```Text
+{
+  transfers(where: { from: "0xSpecificAddress" }) {
+    id
+    from
+    to
+    tokenId
+    blockNumber
+    blockTimestamp
+    transactionHash
+  }
+}
+```
+
+> You can try `0x29469395eAf6f95920E59F858042f0e28D98a20B` for the above query.
+
+### Query to get all transfers related to a specific tokenId
+
+GraphQL
+
+```Text
+{
+  transfers(where: { tokenId: "SPECIFIC_TOKEN_ID" }) {
+    id
+    from
+    to
+    tokenId
+    blockNumber
+    blockTimestamp
+    transactionHash
+  }
+}
+```
+
+> You can try tokenId `3389` for the above query.
+
+### 2. Using Postman
+
+Postman is a great way to quickly test your subgraph and how a simple query looks like when the subgraph responds.
+
+1. [Download](https://www.postman.com/downloads/) and open the Postman application
+2. Select 'New' and select 'HTTP' from the query options.
+3. Enter your subgraph's URL endpoint into the URL field.
+4. In the 'Headers' tab, set the `Key` to `Content-Type` and the `Value` to `application/json`
+5. In the 'Body' tab, select the `raw` radio button
+6. Finally, enter your query as a JSON object in the `query`, you can use this one, for example, to get all the transfers on Pudgy Penguin 100:
+
+JSON
+
+```Text
+{
+  "query": "query { transfers(where: { tokenId: \"100\" }) { id from to tokenId blockNumber blockTimestamp transactionHash } }"
+}
+```
+
+7. Hit 'Send'
+
+You should now see the data print in the Postman console!
