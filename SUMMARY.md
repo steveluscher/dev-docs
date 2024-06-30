@@ -40,6 +40,7 @@
 * [Alchemy API](reference/alchemy-api.md)
 * [QuickNode API](reference/quicknode-api.md)
 * [NodeReal API](reference/nodereal-api.md)
+* [Bitquery API](reference/bitquery-api.md)
 
 ## Layer2 Chains
 
