@@ -4003,3 +4003,929 @@ query ($network: EthereumNetwork!, $address: String!, $inboundDepth: Int!, $limi
 This field can be used to filter the results of the query to only include coinpaths that end at a specific address. For example, the query in the example above will only return coinpaths that end at the address `0xa910f92acdaf488fa6ef02174fb86208ad7722ba`.
 
 The `finalAddress` field can also be used to calculate the total amount of funds that were sent to a specific address. To do this, you can use the count field to count the number of coinpaths that end at the address, and the amount field to sum the amount of funds that were sent in each coinpath.
+
+## GraphQL query optimization for APIs
+
+GraphQL is an open-source query language for APIs. It allows clients to define the required data structure, and the server responds with only that data. This allows for more efficient and flexible communication between the client and server, as well as enabling better performance and easier development of APIs.
+
+GraphQL query optimization is a crucial aspect of utilizing V2 APIs to their full potential. By optimizing your queries, you can significantly reduce the amount of time and resources required to retrieve the data you need.
+
+In this section, we will see how to optimize your V2 API queries.
+
+#### Significance of query optimization for performance[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#significance-of-query-optimization-for-performance) <a href="#significance-of-query-optimization-for-performance" id="significance-of-query-optimization-for-performance"></a>
+
+Query optimization is crucial for achieving optimal performance in any application that processes data through APIs. By optimizing queries, you can significantly reduce the amount of time and resources required to retrieve the data you need. This helps to improve performance, reduce latency, and ensure that your applications are fast, responsive, and reliable. With the right query optimization techniques, you can make the most of API resources and deliver a superior user experience.
+
+The key objectives of query optimization in GraphQL are to improve the performance and efficiency of API requests, reduce network latency, prevent server overload, and deliver a better user experience.
+
+#### Understanding limits in GraphQL[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#understanding-limits-in-graphql) <a href="#understanding-limits-in-graphql" id="understanding-limits-in-graphql"></a>
+
+In V2 APIs, it's crucial to note the implicit default limit applied when a specific limit isn't explicitly defined within a query. [By default, this limit restricts the number of records returned to 10,000](https://docs.bitquery.io/docs/start/errors/#limits). This safeguard is in place to prevent excessive resource consumption, ensuring the efficient processing of queries.
+
+However, to tailor data retrieval according to specific needs, V2 APIs provide the flexibility to set custom limits using the 'limit' parameter.
+
+This filter allows you to refine your query results, ensuring that only the necessary records are returned, reducing unnecessary point consumption risk.
+
+Let's take an example, the below query retrieves information about calls on the BNB network. For each call, it retrieves the internal call and transaction information. The number of responses is restricted to 20 by the limit field.
+
+```
+query CustomLimitQuery {
+  EVM(dataset: combined, network: bsc) {
+    Calls(limit: { count: 20 }) {
+      Call {
+        LogCount
+
+        InternalCalls
+      }
+
+      Transaction {
+        Gas
+
+        Hash
+
+        From
+
+        To
+
+        Type
+
+        Index
+      }
+
+      Block {
+        Date
+      }
+    }
+  }
+}
+```
+
+#### Understanding limitBy[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#understanding-limitby) <a href="#understanding-limitby" id="understanding-limitby"></a>
+
+In addition to the 'limit' parameter, V2 APIs also offer the 'limitBy' parameter, which allows you to set limits based on specific criteria. For example, you can set a limit on the number of records returned based on a certain attribute or field. This helps to further refine your queries and reduce unnecessary resource consumption.
+
+Using the 'limitBy' parameter is particularly useful when dealing with large datasets, as it allows you to retrieve only the data that is relevant to your needs.
+
+Below is an example query that retrieves information about limitBy. For each call, it retrieves the internal call and transaction information. The number of responses is limited to 10 by the 'limit' field.
+
+```
+{
+  EVM(dataset: combined, network: eth) {
+    DEXTrades(
+      where: {
+        Trade: {
+          Buy: {
+            Currency: {
+              SmartContract: {
+                is: "0x5283d291dbcf85356a21ba090e6db59121208b44"
+              }
+            }
+          }
+        }
+      }
+
+      limit: { count: 10 }
+
+      limitBy: { by: Trade_Sell_Currency_SmartContract, count: 1 }
+    ) {
+      Trade {
+        Dex {
+          ProtocolName
+
+          OwnerAddress
+
+          ProtocolVersion
+
+          Pair {
+            SmartContract
+
+            Name
+
+            Symbol
+          }
+        }
+
+        Buy {
+          Currency {
+            Name
+
+            SmartContract
+          }
+        }
+
+        Sell {
+          Currency {
+            Name
+
+            SmartContract
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### Sorting Queries in GraphQL[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#sorting-queries-in-graphql) <a href="#sorting-queries-in-graphql" id="sorting-queries-in-graphql"></a>
+
+Sorting can be done by using the `order by` argument. This argument takes a list of fields to sort by, as well as the direction of the sorting (ascending or descending). For example, if you wanted to sort a list of users by their age in descending order, your GraphQL query looks like below.
+
+```
+query ($network: evm_network, $till: String!, $token: String!, $limit: Int) {
+  EVM(network: $network, dataset: archive) {
+    TokenHolders(
+      tokenSmartContract: $token
+
+      date: $till
+
+      orderBy: { descending: Balance_Amount }
+
+      limit: { count: $limit }
+    ) {
+      Holder {
+        Address
+      }
+
+      Balance {
+        Amount
+      }
+    }
+
+    Blocks(limit: { count: 1 }) {
+      ChainId
+    }
+  }
+}
+```
+
+#### Sort by Metrics[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#sort-by-metrics) <a href="#sort-by-metrics" id="sort-by-metrics"></a>
+
+Sorting by metrics in GraphQL can be achieved by using the `order by` argument along with specific metrics. This allows you to sort data based on certain criteria, such as popularity, rating, or relevance.
+
+Metric-based sorting is a powerful feature in GraphQL that allows you to sort data based on a specific metric or criteria. Let me give you some examples to help explain how this works.
+
+```
+{
+  EVM(network: bsc, dataset: combined) {
+    BalanceUpdates(
+      limit: { count: 1000 }
+      orderBy: { descendingByField: "balance" }
+      where: {
+        Currency: {
+          SmartContract: { is: "0xc748673057861a797275cd8a068abb95a902e8de" }
+        }
+      }
+    ) {
+      BalanceUpdate {
+        Address
+      }
+      balance: sum(of: BalanceUpdate_Amount)
+    }
+  }
+}
+```
+
+In the above example, we use the SUM metric to sort the responses. We give an [alias](https://docs.bitquery.io/docs/graphql/metrics/alias/) to the sum field (Balance) and sort the responses from highest to lowest sum.
+
+#### Filtering data in GraphQL queries[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#filtering-data-in-graphql-queries) <a href="#filtering-data-in-graphql-queries" id="filtering-data-in-graphql-queries"></a>
+
+Filtering data in GraphQL queries is done by using the `where` argument along with specific conditions. This allows you to retrieve only the data that meets certain criteria, such as a specific date range, a certain value, or a particular category. Filtering data is an important feature in GraphQL that allows you to narrow down the results of a query to only the relevant information you need. Let me give you an example to help illustrate how this works.
+
+We will look at how to use filters, with the help of the below example.
+
+```
+{
+  EVM(dataset: combined, network: eth) {
+    buyside: DEXTrades(
+      limit: { count: 10 }
+      orderBy: { descending: Block_Time }
+      where: {
+        Trade: {
+          Buy: {
+            Currency: {
+              SmartContract: {
+                is: "0x5283d291dbcf85356a21ba090e6db59121208b44"
+              }
+            }
+            Seller: { is: "0x1111111254eeb25477b68fb85ed929f73a960582" }
+          }
+        }
+        Block: {
+          Time: { till: "2023-03-05T05:15:23Z", since: "2023-03-03T01:00:00Z" }
+        }
+      }
+    ) {
+      Block {
+        Number
+        Time
+      }
+      Transaction {
+        From
+        To
+        Hash
+      }
+      Trade {
+        Buy {
+          Amount
+          Buyer
+          Currency {
+            Name
+            Symbol
+            SmartContract
+          }
+        }
+        Sell {
+          Amount
+          Buyer
+          Currency {
+            Name
+            SmartContract
+            Symbol
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+In the above GraphQL query, filtering is performed using the `where` argument in conjunction with conditions defined for the Trade and Block.
+
+For the `Trade` filtering, two conditions need to be satisfied.
+
+* The `Buy` property's `Currency` should have a `SmartContract` value of "0x5283d291dbcf85356a21ba090e6db59121208b44", and
+* The `Seller` property should be "0x1111111254eeb25477b68fb85ed929f73a960582".
+
+The `Block` filtering is based on the `Time` property.
+
+The `Time` should fall within a certain range - specifically, from "2023-03-03T01:00:00Z" to "2023-03-05T05:15:23Z".
+
+This combination of filters narrows down the results of `DEXTrades` to only include trades that meet all of the specified conditions within the given time frame.
+
+This will return only the posts that meet this criteria, and will only include their title and content fields in the response.
+
+**Exploring Filter Types and Operators**[**​**](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#exploring-filter-types-and-operators)
+
+Filters play a crucial role in data retrieval systems by narrowing down search results to specific data sets. In the realm of databases, a filter acts as a condition applied to a query, fetching only the records that meet that specific condition. A variety of filter types and operators are available, allowing you to customize your search queries and obtain more accurate results.
+
+Some common filter types include:
+
+1. Text filters: These filters enable you to search for specific text or words within a given field.
+2. Numeric filters: These filters allow you to search for records based on numeric values within a specified range. Numeric filter types encompass:
+
+* Equals: represented by `is` or `=`
+* Not equals: represented by `NOT IN`
+* Greater than: represented by `gt`
+* Less than: represented by `lt`
+* Greater than or equal to: represented by `ge`
+* Less than or equal to: represented by `le`
+
+These operators aid in filtering data based on numeric values.
+
+3. Date filters: These filters enable you to search for records based on specific dates or date ranges.
+4. Boolean filters: These filters facilitate the search for records based on true/false values.
+
+For instance, consider the following query. Here, we utilize a string filter to narrow down the token contract to `0x23581767a106ae21c074b2276D25e5C3e136a68b` and a numeric filter with `ge` (greater than or equal to) 50, indicating a minimum balance requirement:
+
+```
+{
+  EVM(dataset: archive, network: eth) {
+    greater_than_50: TokenHolders(
+      date: "2023-10-23"
+
+      tokenSmartContract: "0x23581767a106ae21c074b2276D25e5C3e136a68b"
+
+      where: { Balance: { Amount: { ge: "50" } } }
+    ) {
+      uniq(of: Holder_Address)
+    }
+
+    greater_than_or_equal_to_50: TokenHolders(
+      date: "2023-10-23"
+
+      tokenSmartContract: "0x23581767a106ae21c074b2276D25e5C3e136a68b"
+
+      where: { Balance: { Amount: { gt: "50" } } }
+    ) {
+      uniq(of: Holder_Address)
+    }
+  }
+}
+```
+
+#### Running the same query for multiple addresses[​](https://docs.bitquery.io/docs/graphql/optimizing-graphql-queries/#running-the-same-query-for-multiple-addresses) <a href="#running-the-same-query-for-multiple-addresses" id="running-the-same-query-for-multiple-addresses"></a>
+
+Let's say you have built a query that filters results using an address filter `{Address: {is: $token}`. To run the same query for multiple addresses, you can change the filter to `{Address: {in: ["A","B","C"]}` where `A`, `B`, `C` are all representative of addresses.
+
+## Filtering
+
+In most cases you do not need the full dataset, but just a portion, related to the entity or range you are interested in.
+
+Filtering can be applied to queries and subscriptions:
+
+* in query, filter defines what part of the dataset you need in results
+* with subscription, filter also determine when the updated data will be sent to you. If the new data does not match filter, update will not be triggered
+
+TIP
+
+Use filters in subscription for notification services on specific type of events matching filter criteria
+
+Filters are defined on the cube element level (Blocks, Transactions, so on) as a `where` attribute.
+
+### Using the OR Condition[​](https://docs.bitquery.io/docs/graphql/filters/#using-the-or-condition) <a href="#using-the-or-condition" id="using-the-or-condition"></a>
+
+In certain cases, you might want to execute a query that filters results based on one condition **OR** another. This type of query can be particularly useful when you need to retrieve records that meet at least one of multiple criteria. This can be achieved with the `any` operator.
+
+The below query for example, retrieves blocks from the Ethereum archive dataset where the block number is greater than `19111970` **OR** the transaction count within a block is greater than `100`. You can run the query (here)\[https://ide.bitquery.io/using-OR-condition-example-V2]
+
+```
+{
+  EVM(dataset: archive, network: eth) {
+    Blocks(
+      where: {any: [{Block: {Number: {gt: "19111970"}}}, {Block: {TxCount: {gt: 100}}}]}
+      limit: {count: 10}
+    ) {
+      Block {
+        Bloom
+        Date
+        Time
+        Root
+        TxCount
+      }
+    }
+  }
+}
+
+```
+
+### Examples[​](https://docs.bitquery.io/docs/graphql/filters/#examples) <a href="#examples" id="examples"></a>
+
+```
+{
+  EVM {
+    Blocks(where: { Block: { GasUsed: { ge: "14628560" } } }) {
+      Block {
+        Number
+      }
+    }
+  }
+}
+```
+
+returns block numbers with gas used exceeding certain level. `where` attribute is structured, with the same levels as the query schema. This allows to build complex filters by combining criteria, as in the following example:
+
+```
+{
+  EVM {
+    Transactions(
+      where: {
+        Block: { GasUsed: { ge: "26000000" } }
+        Transaction: { Gas: { ge: "16000000" } }
+      }
+    ) {
+      Block {
+        GasUsed
+      }
+      Transaction {
+        Gas
+      }
+    }
+  }
+}
+```
+
+NOTE
+
+filters are combined by **AND** principles, result set is an intersection of all criteria defined in the `where` attribute
+
+### Dynamic Where Filter[​](https://docs.bitquery.io/docs/graphql/filters/#dynamic-where-filter) <a href="#dynamic-where-filter" id="dynamic-where-filter"></a>
+
+You can pass the WHERE clause as a parameter to set dynamic conditions for filtering the response. In the below example, we are passing the WHERE clause as a parameter, where we use 'currency' as a filter.
+
+```
+query ($where: EVM_DEXTradeByToken_Filter) {
+  EVM(dataset: archive) {
+    DEXTradeByTokens(
+      limit: {count: 10}
+      where: $where
+      orderBy: {descending: Block_Date}
+    ) {
+      Block {
+        Date
+      }
+      sum(of: Trade_PriceInUSD)
+    }
+  }
+}
+<!-- Parameters -->
+{
+  "where": {
+    "Trade": {
+      "Currency": {
+        "Symbol": {
+          "is": "PEPE"
+        }
+      }
+    }
+  }
+}
+```
+
+> Note: This currently works only for chains on EAP.
+
+#### Passing Each Criterion as a Filter[​](https://docs.bitquery.io/docs/graphql/filters/#passing-each-criterion-as-a-filter) <a href="#passing-each-criterion-as-a-filter" id="passing-each-criterion-as-a-filter"></a>
+
+Each condition can be passed as a parameter to allow for highly customizable queries.
+
+For example, in the below query:
+
+```
+query(
+  $network: evm_network
+  $mempool: Boolean
+    $currency_filter: EVM_DEXTradeByToken_Input_Trade_Currency_InputType
+  $amount_usd_filter: EVM_Amount_With_Decimals
+  $price_usd_filter: OLAP_Float
+  $price_assymetry_filter: OLAP_Float
+) {
+  EVM(network: $network mempool: $mempool) {
+    DEXTradeByTokens(
+      orderBy: {descending: Block_Number}
+      limit: {count: 35}
+
+      where: {
+
+        Trade: {
+          Currency: $currency_filter
+          AmountInUSD: $amount_usd_filter
+          PriceInUSD: $price_usd_filter
+          PriceAsymmetry: $price_assymetry_filter
+        }
+
+      }
+
+    ) {
+
+      Block {
+        Time
+      }
+
+      Transaction {
+        Hash
+      }
+
+      Trade {
+        Buyer
+        Seller
+        Amount
+        AmountInUSD
+        Currency {
+          Symbol
+          SmartContract
+        }
+        Price
+        PriceInUSD
+        PriceAsymmetry
+        Side {
+          Currency {
+            SmartContract
+            Symbol
+          }
+        }
+
+      }
+
+    }
+  }
+}
+<!-- Parameter -->
+
+{
+  "network": "matic",
+  "mempool": false,
+  "currency_filter": { "SmartContract": { "is": "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39"}},
+  "amount_usd_filter": {"ge": "2000.0"},
+  "price_usd_filter": {"ge": 13.59},
+  "price_assymetry_filter": {"ge": 0.001}
+}
+```
+
+we have the following filters:
+
+* **`$currency_filter`**: Filters trades by the currency involved using criteria based on the smart contract address.
+* **`$amount_usd_filter`**: Filters trades by the amount in USD.
+* **`$price_usd_filter`**: Filters trades by the price of the currency in USD.
+* **`$price_assymetry_filter`**: Filters trades by the price asymmetry value.
+
+### Filter Types[​](https://docs.bitquery.io/docs/graphql/filters/#filter-types) <a href="#filter-types" id="filter-types"></a>
+
+Depending on the data type of the element used in `where` filter, different operators can be applied.
+
+#### Numeric Filter Types[​](https://docs.bitquery.io/docs/graphql/filters/#numeric-filter-types) <a href="#numeric-filter-types" id="numeric-filter-types"></a>
+
+For numeric data, the following operators applicable:
+
+* `eq` equals to
+* `ne` not equals to
+* `ge` greater or equal
+* `gt` greater than
+* `le` less or equal
+* `lt` less than
+
+TIP
+
+If you need to define the range of value, use `ge` and `le` together:
+
+```
+          GasUsed: {
+            ge: "26000000"
+            le: "60000000"
+          }
+```
+
+NOTE
+
+Almost all numeric values in blockchain lies above the 32-bit boundary defined for numbers in GraphQL and JSON. So the string values used instead to define any number with not limited precision.
+
+#### String Filter Types[​](https://docs.bitquery.io/docs/graphql/filters/#string-filter-types) <a href="#string-filter-types" id="string-filter-types"></a>
+
+For string data, the following operators applicable:
+
+* `is` equals to
+* `not` not equals to
+
+DANGER
+
+`not` and `ne` filters do not prevent to query large amount of data, consider use them only with some other filters
+
+#### Date and Time Filter Types[​](https://docs.bitquery.io/docs/graphql/filters/#date-and-time-filter-types) <a href="#date-and-time-filter-types" id="date-and-time-filter-types"></a>
+
+For date and timestamp data, the following operators applicable:
+
+* `is` date equals to
+* `not` date not equals to
+* `after` after certain date (not including it)
+* `since` after including date
+* `till` before including date
+* `before` before not including date
+
+#### Array Filter Types[​](https://docs.bitquery.io/docs/graphql/filters/#array-filter-types) <a href="#array-filter-types" id="array-filter-types"></a>
+
+Array fields can be filtered using the following conditions:
+
+* `length` condition on array length;
+* `includes` if array include item defined by the condition;
+* `excludes` if array exclude item defined by the condition;
+* `startsWith` if array starts with the item defined by the condition;
+* `endsWith` if array ends with the item defined by the condition;
+* `notStartsWith` if array does not start with the item defined by the condition;
+* `notEndsWith` if array does not end with the item defined by the condition;
+
+NOTE
+
+Note that all conditions on items can be a list, they all applied to selecting the item in AND manner.
+
+Example of the condition is the following:
+
+```
+{
+  EVM {
+    Calls(
+      where: {
+        Arguments: {
+                    length: {eq: 2}
+          includes: {
+            Index: {eq: 0}
+            Name: {is: "recipient"}
+          }
+        }
+      }
+      limit: {count: 10}) {
+      Arguments {
+        Index
+        Name
+        Type
+      }
+      Call {
+        Signature {
+          Signature
+        }
+      }
+    }
+  }
+}
+
+```
+
+Filter selects calls which have 2 arguments, and the first argument name is "recipient"
+
+Condition can combine conditions on the items:
+
+```
+Arguments: {
+          includes: [
+            {
+            Index: {eq: 0}
+            Name: {is: "recipient"}
+            Value: {Address: {is: "0xa7f6ebbd4cdb249a2b999b7543aeb1f80bda7969"}}
+           }
+           {
+            Name: {is: "amount"}
+            Value: {BigInteger: {ge: "1000000000"}}
+           }
+          ]
+        }
+      }
+```
+
+It extends the previous example, selecting only calls that have all 4 conditions:
+
+* the first argument named 'recipient'
+* the first argument value of type address equal to '0xa7f6ebbd4cdb249a2b999b7543aeb1f80bda7969'
+* any argument called "amount"
+* argument named "amount" having value bigger than 1000000000
+
+### Filtering: Where vs selectWhere[​](https://docs.bitquery.io/docs/graphql/filters/#filtering-where-vs-selectwhere) <a href="#filtering-where-vs-selectwhere" id="filtering-where-vs-selectwhere"></a>
+
+The `selectWhere` parameter functions similarly to the `HAVING` clause in SQL, allowing users to filter on aggregated data.
+
+To demonstrate the use of `selectWhere`, consider the following query that retrieves blocks from the EVM dataset and filters based on a transaction count greater than 1,500,000.
+
+```
+query {
+  EVM(dataset: archive) {
+    Blocks {
+      Block {
+        Date
+      }
+      sum(of: Block_TxCount selectWhere: {gt: "1500000"})
+    }
+  }
+}
+```
+
+**sum(of: Block\_TxCount selectWhere: {gt: "1500000"})**: Applies the `sum` aggregate function to `Block_TxCount` and filters for sums greater than 1,500,000.
+
+In this example, the query retrieves block data and applies a filter on the sum of transaction counts to include only those blocks where the transaction count exceeds 1,500,000.
+
+This is different from the `where` clause, which is used to filter the blocks based on the transaction count:
+
+```
+query {
+  EVM(dataset: archive) {
+    Blocks(where: {Block: {TxCount: {gt: 1500000}}}) {
+      Block {
+        Date
+      }
+    }
+  }
+}
+```
+
+* **Blocks(where: {Block: {TxCount: {gt: 1500000\}}})**: Filters blocks directly where `TxCount` is greater than 1,500,000 before aggregation.
+
+In this query, the `where` clause directly filters blocks with transaction counts greater than 1,500,000 before any aggregation occurs.
+
+## Query Fact Records
+
+This is the simplest type of query. You just define the attributes which you need in the results, and you get all records directly from the database matching [limits](https://docs.bitquery.io/docs/graphql/limits/), [sorting](https://docs.bitquery.io/docs/graphql/sorting/) and [filters](https://docs.bitquery.io/docs/graphql/filters/).
+
+Note that fact tables are typically long beasts, and querying the complete content of them not possible at all. So in reality you can query only a small portion of data, and there is no good way to get the complete dataset just by querying the fact tables, even using [limits](https://docs.bitquery.io/docs/graphql/limits/) and offsets.
+
+This type of query is useful in the following cases:
+
+1. query some specific sub-set of the data, with the very well-defined filters. For example, the last token transfers of specific address for today. The more precise filter you define, the better it will run. Date or time filters are essential in this case.
+2. define ordering and query just the last records. This type of query should also take care about date / time filtering especially if you query archive data.
+
+[Query example ](https://graphql.bitquery.io/ide/Last-transactions-with-cost)to get the last transactions in the blockchain with the cost of them:
+
+```
+query {
+  EVM(dataset: realtime network: bsc) {
+    Transactions(limit: {count: 100}
+    orderBy: [{descending: Block_Number} {descending: Transaction_Index}]) {
+      Block {
+        Time
+        Number
+      }
+      Transaction {
+        Hash
+        Cost
+      }
+    }
+  }
+}
+```
+
+## Query Principles
+
+You query the data using [GraphQL](https://graphql.org/) language. Basically it defines simple rules how the schema is defined, and how to query the data using this schema.
+
+### Schema[​](https://docs.bitquery.io/docs/graphql/query/#schema) <a href="#schema" id="schema"></a>
+
+Schema defines what data you can query and which options (arguments) you can apply to the query. Schema allows [IDE](https://docs.bitquery.io/docs/ide/login/) to create hints to build the query interactively. [IDE](https://docs.bitquery.io/docs/ide/login/) also shows the schema on query builder and in Document section. Only queries matching schema can be successfully executed.
+
+Schema for blockchain data is pretty complicated, but for your queries you do not need to see it full. You only need a portion of it related to your needs typically.
+
+### Query vs Subscription[​](https://docs.bitquery.io/docs/graphql/query/#query-vs-subscription) <a href="#query-vs-subscription" id="query-vs-subscription"></a>
+
+Query is used to query the data. When you need to get updated results, you must query the endpoint again with the same or another query.
+
+Subscription is used to get data updates. You define a [subscription](https://docs.bitquery.io/docs/subscriptions/subscription/), and after the new data appear, it will be delivered to you without any actions from your side.
+
+This defines the cases, when to use one or another:
+
+* use queries when you need data once, or the data not likely changed during its usage period
+* use subscriptions for the "live" data, or when data may be changed while using it
+
+Good news, that queries and [subscriptions](https://docs.bitquery.io/docs/subscriptions/subscription/) use identical schemas, except some attributes of the top element, to define the [dataset](https://docs.bitquery.io/docs/graphql/dataset/options/) usage. It allows your applications to switch between pull and push modes of operation with a minimal changes of the code and queries.
+
+Compare the code in [the first query](https://docs.bitquery.io/docs/start/first-query/) and [the first subscription](https://docs.bitquery.io/docs/start/getting-updates/) to see the difference.
+
+This section describes principles that applies to subscriptions as well as to queries. We will show examples for queries, but remember that they applied to [subscriptions](https://docs.bitquery.io/docs/subscriptions/subscription/) as well.
+
+### Query Elements[​](https://docs.bitquery.io/docs/graphql/query/#query-elements) <a href="#query-elements" id="query-elements"></a>
+
+Consider the query:
+
+```
+query {
+  EVM(dataset: archive network: bsc) {
+    Blocks(limit: {count: 10}) {
+      Block {
+        Date
+      }
+      count
+    }
+  }
+}
+```
+
+#### Dataset Element[​](https://docs.bitquery.io/docs/graphql/query/#dataset-element) <a href="#dataset-element" id="dataset-element"></a>
+
+Top element of the query is
+
+```
+  EVM(dataset: archive network: bsc) {
+```
+
+which defines the type of schema used (`EVM`, Ethereum Virtual Machine). For different types of blockchains we use different schema.
+
+`dataset: archive network: bsc` is an attribute, defining how we query the [dataset](https://docs.bitquery.io/docs/graphql/dataset/options/). In this case, we query just archive (delayed) data on BSC (Binance Smart Chain) network. Refer to the [dataset](https://docs.bitquery.io/docs/graphql/dataset/options/) documentation for possible options to apply on this level.
+
+By selecting the top element `EVM` we completely define what we can query below this element. Apparently, Bitcoin and Ethereum have different schema and data, so we can not query them exactly the same way.
+
+#### Cube Element[​](https://docs.bitquery.io/docs/graphql/query/#cube-element) <a href="#cube-element" id="cube-element"></a>
+
+`Blocks(limit: {count: 10})` is what we call "Cube", particulary because we use [OLAP](https://wikipedia.org/wiki/OLAP) methodology, applying [metrics](https://docs.bitquery.io/docs/graphql/metrics/). Cube defines what kind of facts we want to query, in this case we interested in blocks. Cubes are generally different for different types of blockchains.
+
+#### Dimension Element[​](https://docs.bitquery.io/docs/graphql/query/#dimension-element) <a href="#dimension-element" id="dimension-element"></a>
+
+```
+Block {
+        Date
+      }
+```
+
+is the dimension part of the query. It defines the granularity of the data that we query. This example queries the data per-date manner. If we would need to have it per block, we would use:
+
+```
+Block {
+        Number
+      }
+```
+
+Query can make many dimensions. Result will have granularity combined from all dimensions used. Query for transactions by block date and transaction hash will group all result by block **date** **AND** by transaction **hash**:
+
+```
+      Block {
+        Date
+      }
+      Transaction {
+        Hash
+      }
+```
+
+#### Metric Element[​](https://docs.bitquery.io/docs/graphql/query/#metric-element) <a href="#metric-element" id="metric-element"></a>
+
+`count` is a [metric](https://docs.bitquery.io/docs/graphql/metrics/). It is optional, defines "what we want to measure". If it is missing, the results will give all data with the selected dimensions.
+
+Note that the presence of at least one [metric](https://docs.bitquery.io/docs/graphql/metrics/) changes the way how query operates. Compare these two queries:
+
+The following query returns as many entries as blocks we have, with the date for each block:
+
+```
+Block {
+        Date
+      }
+```
+
+This return counts of blocks **per every date** (aggregated by all blocks) :
+
+```
+Block {
+        Date
+      }
+      count
+```
+
+Refer to the [metric](https://docs.bitquery.io/docs/graphql/metrics/) tutorial for more details how you can use them.
+
+#### Attributes[​](https://docs.bitquery.io/docs/graphql/query/#attributes) <a href="#attributes" id="attributes"></a>
+
+`limit: {count: 10}` is an attribute, defining [limit](https://docs.bitquery.io/docs/graphql/limits/) on the data result size.
+
+There are several types of attributes, described in the sections:
+
+* [limits](https://docs.bitquery.io/docs/graphql/limits/)
+* [ordering](https://docs.bitquery.io/docs/graphql/sorting/)
+* [filters](https://docs.bitquery.io/docs/graphql/filters/)
+* [calculations](https://docs.bitquery.io/docs/graphql/calculations/)
+
+#### Correctness[​](https://docs.bitquery.io/docs/graphql/query/#correctness) <a href="#correctness" id="correctness"></a>
+
+To be correctly executed, the query must conform with the following requirements:
+
+1. query must conform the schema. When you build query in the [IDE](https://docs.bitquery.io/docs/ide/login/), it will highlight all errors according to schema
+2. query should not violate principles described above and some natural limitations of the database capabilities. For example, you can not fetch a million result in one query, you have to use offset and limits.
+3. query should not consume more than available resources on the server. We use points to calculate consumed resources.
+
+If query can not execute, the result contains the `errors` in the results
+
+## Array Intersection
+
+The `array_intersect` feature is an advanced query format that generates an intersection of addresses from specified datasets. You can use the `where` clause to introduce filters that refine your results according to desired criteria. The output is a list of addresses that share a common link to the two datasets. ![](https://docs.bitquery.io/assets/images/array\_intersect-bf4c1feb87a76efe2d9b6d75d5816c98.png)
+
+In the following section, we'll explore how to use `array_intersect` to reveal the associations between pairs of addresses or contracts.
+
+#### Syntax[​](https://docs.bitquery.io/docs/graphql/capabilities/array-intersect/#syntax) <a href="#syntax" id="syntax"></a>
+
+```
+array_intersect(side1: side1, side2: side2, intersectWith: array)
+```
+
+where
+
+* `side1`: The first array that you want to compare.
+* `side2`: The second array that you want to compare.
+* `intersectWith`: The array containing elements to be used for intersection with the first two arrays.
+
+Constraints:
+
+* Applicable only to fields with a string data type.
+* The function can retrieve only addresses when returning the response; other response fields are not supported in the output.
+
+#### Example[​](https://docs.bitquery.io/docs/graphql/capabilities/array-intersect/#example) <a href="#example" id="example"></a>
+
+Suppose you have an array of two addresses ( A and B ) and want to identify which addresses have engaged in transactions with both Contract A and Contract B. By passing these arrays to array\_intersect, the function will return an array of addresses that interacted with both contracts.
+
+```
+query($addresses: [String!]) {
+  EVM(dataset: archive){
+    Transfers(
+      where: {
+        any: [
+          {
+              Transfer: {Sender: {in: $addresses} Receiver: {notIn: $addresses}}
+
+          },
+          {
+            Transfer: {Receiver: {in: $addresses} Sender: {notIn: $addresses}}
+          },
+        ]
+      }
+
+    ) {
+
+      array_intersect(
+        side1: Transfer_Sender
+        side2: Transfer_Receiver
+        intersectWith: $addresses
+      )
+
+    }
+  }
+}
+<!-- Parameters -->
+{
+  "addresses": ["0x21743a2efb926033f8c6e0c3554b13a0c669f63f","0x107f308d85d5481f5b729cfb1710532500e40217"]
+}
+
+```
+
+This query will return a response in this format ; as an array consisting of elements found in both side1 and side2 that have interacted with **all the addresses** in the intersectWith array. If no common elements are detected, the result will be an empty array.
+
+```
+{
+  "EVM": {
+    "Transfers": [
+      {
+        "array_intersect": [
+          "0xba5a64df95acba7c0f43e830f5622cbd389cfc4d",
+          "0x74374f95e4630df9b7f70b2d45e64da6437885c7",
+          "0x3f1f6f2537d095b6f5650b371c11dcc8bc90b0f3"]
+      }
+    ]
+  }
+}
+```
