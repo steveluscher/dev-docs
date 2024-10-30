@@ -89,7 +89,7 @@ API DOCUMENTATION
 Running this example requires a minimum of [NodeJS 16](https://nodejs.org/en/). In your command line terminal, install the libraries.
 
 ```
-npm i @solana/web3.js
+npm i @solana/web3.js@1
 npm i cross-fetch
 npm i @project-serum/anchor
 npm i bs58

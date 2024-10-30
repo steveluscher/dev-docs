@@ -31,7 +31,7 @@ Run the following command to install the Solana Web3.js library with npm or yarn
 npmyarn
 
 ```
-npm install --save @solana/web3.js
+npm install --save @solana/web3.js@1
 ```
 
 ### 4. Make your first request
